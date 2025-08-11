@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Space Explorer Quiz</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="quiz-container">
+        <!-- Start Screen -->
+        <div class="start-screen" id="startScreen">
+            <h1>🤖 SentientAGI Quiz</h1>            
+            </body>
+            </html>
+            <p>Test your knowledge about artificial general intelligence and machine learning!</p>
+            <button class="btn" onclick="startQuiz()">Start Quiz</button>
+        </div>
+
+    <!-- Question Screen -->
+    <div class="question-container" id="questionContainer">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="question-number" id="questionNumber"></div>
+        <div class="question" id="question"></div>
+        <div class="answers" id="answers"></div>
+        <button class="btn" id="nextBtn" type="button" onclick="nextQuestion()">Next Question</button>
+    </div>
+
+    <!-- Results Screen -->
+    <div class="results-screen" id="resultsScreen">
+        <h2>Quiz Complete! 🎉</h2>
+        <div class="score" id="finalScore"></div>
+        <div class="score-message" id="scoreMessage"></div>
+        <button class="btn restart-btn" onclick="restartQuiz()">Take Quiz Again</button>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        {
+            question: "What does AI stand for?",
+            answers: ["Artificial Intelligence", "Automated Intelligence", "Advanced Intelligence"],
+            correct: 0
+        },
+        {
+            question: "Which of these is a type of machine learning?",
+            answers: ["Supervised Learning", "Creative Learning", "Manual Learning"],
+            correct: 0
+        },
+        {
+            question: "What is a neural network inspired by?",
+            answers: ["Computer circuits", "The human brain", "Internet connections"],
+            correct: 1
+        },
+        {
+            question: "What does GPU stand for in AI computing?",
+            answers: ["General Processing Unit", "Graphics Processing Unit", "Global Processing Unit"],
+            correct: 1
+        },
+        {
+            question: "Which company created ChatGPT?",
+            answers: ["Google", "OpenAI", "Microsoft"],
+            correct: 1
+        },
+        {
+            question: "What is the goal of AGI?",
+            answers: ["Faster computers", "Human-level intelligence", "Better graphics"],
+            correct: 1
+        },
+        {
+            question: "What does NLP stand for?",
+            answers: ["Natural Language Processing", "New Learning Process", "Neural Logic Programming"],
+            correct: 0
+        },
+        {
+            question: "Which is an example of deep learning?",
+            answers: ["Image recognition", "Simple calculations", "File storage"],
+            correct: 0
+        },
+        {
+            question: "What is training data used for?",
+            answers: ["Teaching AI models", "Storing files", "Running programs"],
+            correct: 0
+        },
+        {
+            question: "What does ML stand for?",
+            answers: ["Machine Learning", "Manual Logic", "Memory Loading"],
+            correct: 0
+        }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let selectedAnswer = null;
+
+    function startQuiz() {
+        document.getElementById('startScreen').classList.add('hidden');
+        document.getElementById('questionContainer').classList.remove('hidden');
+        currentQuestion = 0;
+        score = 0;
+        showQuestion();
+    }
+
+    function showQuestion() {
+        const question = quizData[currentQuestion];
+        document.getElementById('questionNumber').textContent = `Question ${currentQuestion + 1} of ${quizData.length}`;
+        document.getElementById('question').textContent = question.question;
+        
+        const answersContainer = document.getElementById('answers');
+        answersContainer.innerHTML = '';
+        
+        question.answers.forEach((answer, index) => {
+            const answerDiv = document.createElement('div');
+            answerDiv.className = 'answer';
+            answerDiv.textContent = answer;
+            answerDiv.onclick = () => selectAnswer(index, answerDiv);
+            answersContainer.appendChild(answerDiv);
+        });
+
+        updateProgressBar();
+        document.getElementById('nextBtn').style.display = 'none';
+        selectedAnswer = null;
+    }
+
+    function selectAnswer(answerIndex, answerElement) {
+        // Clear previous selections
+        document.querySelectorAll('.answer').forEach(el => {
+            el.classList.remove('selected', 'correct', 'incorrect');
+        });
+
+        selectedAnswer = answerIndex;
+        answerElement.classList.add('selected');
+
+        // Show correct/incorrect after selection
+        setTimeout(() => {
+            const correctIndex = quizData[currentQuestion].correct;
+            document.querySelectorAll('.answer').forEach((el, index) => {
+                if (index === correctIndex) {
+                    el.classList.add('correct');
+                } else if (index === selectedAnswer && index !== correctIndex) {
+                    el.classList.add('incorrect');
+                }
+            });
+
+            if (selectedAnswer === correctIndex) {
+                score++;
+            }
+
+            document.getElementById('nextBtn').style.display = 'block';
+        }, 500);
+    }
+
+    function nextQuestion() {
+        currentQuestion++;
+        if (currentQuestion < quizData.length) {
+            showQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function updateProgressBar() {
+        const progress = ((currentQuestion + 1) / quizData.length) * 100;
+        document.getElementById('progressFill').style.width = progress + '%';
+    }
+
+    function showResults() {
+        document.getElementById('questionContainer').classList.add('hidden');
+        document.getElementById('resultsScreen').classList.remove('hidden');
+        
+        const percentage = Math.round((score / quizData.length) * 100);
+        document.getElementById('finalScore').textContent = `${score}/${quizData.length}`;
+        
+        let message = '';
+        if (percentage >= 90) {
+            message = "🤖 Outstanding! You're an AI expert!";
+        } else if (percentage >= 70) {
+            message = "🧠 Great job! You know your AI basics!";
+        } else if (percentage >= 50) {
+            message = "📚 Not bad! Keep learning about AI!";
+        } else {
+            message = "🚀 Keep studying - AI is the future!";
+        }
+        
+        document.getElementById('scoreMessage').textContent = `${percentage}% - ${message}`;
+    }
+
+    function restartQuiz() {
+        document.getElementById('resultsScreen').classList.add('hidden');
+        document.getElementById('startScreen').classList.remove('hidden');
+        currentQuestion = 0;
+        score = 0;
+    }
+</script>
+<style>
+    #nextBtn {
+    display: none;
+    }
+</style>
+
+</body>
+</html>
